@@ -1,0 +1,7 @@
+**/__pycache__
+/venv
+*.log
+.env
+test.py
+*.pem
+**.db
