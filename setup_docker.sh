@@ -6,7 +6,16 @@ TAG_CONTAINER=false
 PUSH_CONTAINER=false
 CLEAN_CONTAINER=false
 HOST=""
-TAG="template:latest" #set default tag in case user didnt provide one
+
+if [ -n "$CONTAINER_TAG" ]; then
+    TAG="$CONTAINER_TAG"
+elif [ -n "$TAG" ]; then
+    TAG="$TAG"
+else
+    echo "[🐋] Error: Neither 'CONTAINER_TAG' nor 'TAG' environment variables are set."
+    echo "      Please set one before running this script."
+    exit 1
+fi
 
 validate_tag() {
     if [[ ! "$1" =~ ^[a-zA-Z0-9._-]+:[a-zA-Z0-9._-]+$ ]] && [[ ! "$1" =~ ^[a-zA-Z0-9._-]+$ ]]; then
@@ -58,7 +67,8 @@ while [[ $# -gt 0 ]]; do
             ;;
         -c|--clean)
             CLEAN_CONTAINER=true
-            docker image prune -a #docker will ask for confirmation, no need to handle it here
+            docker image prune -a 
+            shift
             ;;
         *)
             echo "[🐋] Unknown option $1"
@@ -83,7 +93,6 @@ fi
 
 if command -v docker >/dev/null 2>&1; then
     echo "[🐋] Docker is already installed"
-
 else
     echo "[🐋] Docker could not be found, installing..."
     
